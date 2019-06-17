@@ -3,6 +3,7 @@ import time
 import serial
 import numpy as np
 from timeit import default_timer as timer
+import matplotlib.pyplot as plt
 
 
 
@@ -84,6 +85,8 @@ class neuron_controller():
         self.uart = uart_com(port=port, baudrate=baudrate, timeout=timeout)
         
         self.window = window
+        
+        self.decoding = 'ascii'
   
     def send_word(self, binary_string):
         byte_array = self.bin_str_to_bytes(binary_string)
@@ -108,21 +111,57 @@ class neuron_controller():
             byte_array.append(int_val)
         return byte_array
 
-
     def check_for_output(self):
         return self.connection.dataInReadBuffer()
     
     # Commands to read from the FPGA
     def read_cycle(self):
+        '''
+        convert raw output from fpga to numpy 
+        '''       
+        psp = np.zeros(110)
+        voltage = np.zeros(10)
+        spikes = np.zeros(10)
+        
         data = self.read_data()
-        decoded = data.decode('ascii')
-        split = decoded.split('\n')
-        spikes = None
-        PSP = split[6]
-        voltage = split[7]
-        # TODO: determine structure of output
-        # TODO: Convert bytes into fixed (private function)
-        return spikes, PSP, voltage
+         
+        if self.decoding == 'ascii':
+            decoded = data.decode('ascii')
+            split = decoded.split('\n')
+            psp_str = split[0].split(',')
+            voltage_str = split[1].split(',')
+            
+            #data in fpga is is represented by fixed(16,4) format, so divided by 2^12
+            for i in range(110):
+                psp[i] = int(psp_str[i]) / 4096
+            
+            for i in range(10):
+                voltage[i] = int(voltage_str[i]) / 4096
+                spikes[i] = int(voltage[i] > 1)
+         
+        else:
+            #data is a list, every 5 bytes belong to a packet
+            #split data into chunks of 5
+            split_data = [data[i:i + 5] for i in range(0, len(data), 5)]
+            #0-110 are psp
+            psp_bytes = split_data[0:110]
+            #110 to 120 are voltage
+            voltage_bytes = split_data[110:]
+            #convert raw bytes to integers
+            for i,val_byte in enumerate(psp_bytes):
+                #microblaze sends lsb fisrt, so lsb stores in [1], msb in [3]
+                #byte order is little endian
+                u16 = int.from_bytes(val_byte[1:], byteorder = 'little')
+                int16 = self.u16toint(u16)
+                psp[i] = int16
+            
+            voltage_bytes = split_data[110:]
+            for i,val_byte in enumerate(psp_bytes):
+                u16 = int.from_bytes(val_byte[1:], byteorder = 'little')
+                int16 = self.u16toint(u16)
+                psp_bytes[i] = int16
+        return spikes, psp, voltage
+
 
     # Commands to write to the FPGA
     def start_cycle(self):
@@ -130,13 +169,19 @@ class neuron_controller():
         self.uart.write_blocking(cmd_start)
     
     def run_one_step(self):
+        '''
+        run neuron for one time step, including send start command, and read results
+        '''
         self.start_cycle();
         data = self.read_cycle()
         return data
 
     def reset_neuron(self):
+        '''
+        reset psp
+        '''
         cmd_reset = bytearray([0,0,0,CMD_RESET_NEURON])
-        self.connection.writeb(cmd_reset)
+        self.uart.write_blocking(cmd_reset)
 
     def set_spikes(self, spike_array: np.array):
         '''
@@ -147,123 +192,70 @@ class neuron_controller():
         input_spike_index = np.where(spike_array!=0)[0]
         for idx in input_spike_index:
             spike_packet = bytearray([0,0,idx,CMD_SET_SPIKE])
-        self.uart.write_blocking(spike_packet)
+            self.uart.write_blocking(spike_packet)
 
-    def set_test_spikes(self, spikeTrain: np.array):
+    def set_test_spikes(self):
         cmd_test_spikes = bytearray([0,0,0,CMD_SET_TEST_SPIKE])
         self.uart.write_blocking(cmd_test_spikes)
 
     def clear_spikes(self):
+        '''
+        set spike buffer in microblaze to 0
+        '''
         cmd_clear_spikes = bytearray([0,0,0,CMD_CLEAR_BUFFERED_SPIKE])
         self.uart.write_blocking(cmd_clear_spikes)
-
     
-
-#com = serial.Serial(port='COM5', baudrate=9600,bytesize=8, timeout=None)
-#com = uart_com(port='COM5', baudrate=9600, timeout=1)
+    def chunks(self, l, n):
+        """Yield successive n-sized chunks from l.
+        https://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks
+        """
+        for i in range(0, len(l), n):
+            yield l[i:i + n]
+    
+    def u16toint(self, u16):
+        '''
+        assume the u16 is unsigned integer, convert it to int
+        '''
+        #value in fpga is represented by fixpoint(16,4), while in microblaze,
+        #it is converted to u32. so only keep lower 16 bits
+        u16 = u16 & 0xFFFF
+        
+        #convert unsigned to signed
+        if u16 > 32767:
+            return u16-65536
+        else:
+            return u16
+    
+    def disconnect(self):
+        self.uart.serial.close()
+        
 
 spike = np.load('D:/islped_demo/snn/noise_train.npy')
 
 test_spike = spike[0]
-controller = neuron_controller(450, port='COM5', baudrate=230400, timeout=0.1)
-
-input_spike_index = np.where(test_spike[114]!=0)[0]
-for idx in input_spike_index:
-    spike_packet = bytearray([0,0,idx,CMD_SET_SPIKE])
-    print(spike_packet)
+controller = neuron_controller(WINDOW, port='COM5', baudrate=230400, timeout=0.1)
 
 start = timer()
 
-for i in range(450):
-    print(i)
-    data = controller.run_one_step()
+#record voltage[instance_idx, neuron_id, time_step]
+v_record = np.zeros([100,10,WINDOW])
+controller.reset_neuron()
+
+#run for multiple samples
+for i in range(2):
+    #for every time step
+    for j in range(WINDOW):
+        controller.set_spikes(spike[i,j,:])
+        s,p,v = controller.run_one_step()
+        v_record[i,:,j] = v
+        #reset psp at last step
+        if (j == 450-1):
+            controller.reset_neuron()
 
 # ...
 end = timer()
 print(end - start) # Time in seconds, e.g. 5.38091952400282
 
-#while(5):
-#    controller.send_word('00000111 00000000 00000011 00001111')
-#    data = controller.read_data()
-#    print(data)
-    
-    
-#    receive = com.read_blocking()
-#    print(receive.decode("utf-8"))
-#    inp = input('input command')
-#    command = bin_str_to_bytes(inp)
-#    com.write_blocking(command)
-#    receive = com.read_blocking()
-#    print(receive.decode("utf-8"))
+for i in range(10):
+    plt.plot(v_record[0,i])
 
-'''
-def test_read_data():
-    # Start Timer
-    st = time.time()
-    # Read data from FPGA
-    data_read = s.readb()
-    # Update GUI with data from FPGA
-    gui_data.config(text=data_read)
-    # Complete timing analysis
-    t = time.time() - st
-    in_time_array.append(t) # Add
-    in_time_array.pop(0)
-    t_avg = sum(in_time_array)/time_average_range
-    t_win = window_size * t_avg
-    # Update GUI with timing analysis
-    gui_intimer.config(text='In Time = {0:.9f} seconds. Estimated Time Per Window = {1:.9f} seconds.'.format(t_avg,t_win))
-    # Schedule next write
-    gui.after(DELAY, test_write_data)
-
-def test_write_data():
-    # Start Timer
-    st = time.time()
-    # Create next write data
-    # Get current value of slider
-    slider_status = var.get()
-    write_data = bytearray(data_out_size)
-    for i in range(data_out_size):
-        offset = (slider_status + (i*1)) % 26
-        write_data[i] = offset + 65
-    # Write data
-    s.writeb(write_data)
-    # Update GUI with new data written to FPGA
-    gui_wdata.config(text=write_data)
-    # Complete timing analysis
-    t = time.time() - st
-    out_time_array.append(t)
-    out_time_array.pop(0)
-    t_avg = sum(out_time_array)/time_average_range
-    t_win = window_size * t_avg
-    # Update GUI with timing analysis
-    gui_outtimer.config(text='Out Time = {0:.9f} seconds. Estimated Time Per Window = {1:.9f} seconds.'.format(t_avg,t_win))
-    # Schedule next read
-    gui.after(DELAY, test_read_data)
-
-# Initialize GUI labels
-gui = tkinter.Tk()
-gui.title('Test COM')
-var = tkinter.IntVar()
-# Display Data from FPGA
-gui_data = tkinter.Label(gui, text=bytearray(data_in_size), width=250)
-gui_data.pack()
-# Display the Data currently being written to FPGA
-gui_wdata = tkinter.Label(gui, text=bytearray(data_out_size))
-gui_wdata.pack()
-# Display the Current time to Read and Estimated Total time
-gui_intimer = tkinter.Label(gui, text=bytearray(16))
-gui_intimer.pack()
-# Display the Current time to Write and Estimated Total time
-gui_outtimer = tkinter.Label(gui, text=bytearray(16))
-gui_outtimer.pack()
-# Create Slider to vary data sent to FPGA
-gui_slider = tkinter.Scale(gui, from_=0, to=25, variable=var, orient=tkinter.HORIZONTAL)
-gui_slider.pack()
-# Create Button to destroy window
-button_exit = tkinter.Button(gui, text='Close', width=25, command=gui.destroy)
-button_exit.pack()
-# Schedule first Write Data
-gui.after(1,test_write_data())
-# Display Gui
-gui.mainloop()
-'''
