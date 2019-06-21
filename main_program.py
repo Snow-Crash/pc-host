@@ -4,6 +4,15 @@ import serial
 import numpy as np
 from timeit import default_timer as timer
 import matplotlib.pyplot as plt
+import tkinter as Tk
+import numpy as np
+import matplotlib.animation as animation
+from pyqtgraph.Qt import QtCore, QtGui
+import pyqtgraph.opengl as gl
+import pyqtgraph as pg
+from PyQt5 import QtTest
+import sys
+import multiprocessing
 
 
 
@@ -228,6 +237,9 @@ class neuron_controller():
     
     def disconnect(self):
         self.uart.serial.close()
+    
+    def run_one_step_fake(self):
+        return np.random.rand(10), np.random.rand(110), np.random.rand(10)
         
 
 spike = np.load('D:/islped_demo/snn/noise_train.npy')
@@ -235,27 +247,117 @@ spike = np.load('D:/islped_demo/snn/noise_train.npy')
 test_spike = spike[0]
 controller = neuron_controller(WINDOW, port='COM5', baudrate=230400, timeout=0.1)
 
-start = timer()
+#manager = multiprocessing.Manager()
+#shared_list = manager.list()
+#n = 0
+#process1 = multiprocessing.Process(
+#    target=write_only, args=[shared_list,n])
+#process2 = multiprocessing.Process(
+#    target=read_only, args=[shared_list])
+#process1.start()
+#process2.start()
+#process1.join()
+#process2.join()
 
 #record voltage[instance_idx, neuron_id, time_step]
 v_record = np.zeros([100,10,WINDOW])
 controller.reset_neuron()
 
-#run for multiple samples
-for i in range(2):
-    #for every time step
-    for j in range(WINDOW):
-        controller.set_spikes(spike[i,j,:])
-        s,p,v = controller.run_one_step()
-        v_record[i,:,j] = v
-        #reset psp at last step
-        if (j == 450-1):
-            controller.reset_neuron()
+test_pyqtgraph = False
+use_fake_data = True
 
-# ...
-end = timer()
-print(end - start) # Time in seconds, e.g. 5.38091952400282
+if test_pyqtgraph:
+    start = timer()
+    app = QtGui.QApplication(sys.argv)
+    w = gl.GLViewWidget()
+    w.setBackgroundColor('w')
+    w.opts['azimuth'] = 90
+    w.opts['elevation'] = 0
+    w.setGeometry(0, 110, 1920, 1080)
+    w.show()
+    
+    traces = dict()  
+    
+    for i in range(10):
+        x = np.array(range(450))
+        y = np.zeros(450)
+        z = np.zeros(450)
+        pts = np.vstack([x, y, z]).transpose()
+        traces[i] = gl.GLLinePlotItem(
+            pos=pts,
+            color=pg.glColor((i, 10 * 1.3)),
+            width=(i + 1) / 10,
+            antialias=True,
+        )
+        #if use white background
+        #reference: https://github.com/pyqtgraph/pyqtgraph/issues/193
+        traces[i].setGLOptions('translucent')
+        w.addItem(traces[i])
+    
+    for j in range(450):
+        for i in range(10):
+            if use_fake_data:
+                s,p,v = controller.run_one_step_fake()
+                v_record[i,:,j] = v
+                z = v_record[0,i,0:j] + i*5
+            else:   
+                controller.set_spikes(spike[i,j,:])
+                s,p,v = controller.run_one_step()
+                v_record[i,:,j] = v
+                # z coordinates represent voltage
+                # + 5 to plac each trace at different vertical position
+                z = v_record[0,i,0:j] + i*5
+                #reset psp at last step
+                if (j == 450-1):
+                    controller.reset_neuron()
+            
+            x = np.array(range(0,j))
+            y = np.zeros(j)
 
-for i in range(10):
-    plt.plot(v_record[0,i])
+            z = np.random.rand(j) + i * 5
+            pts = np.vstack([x, y, z]).transpose()
+            
+            traces[i].setData(pos=pts, color=pg.glColor((i, 10 * 1.3)), width=3)
+        print(j)
+    #    QtTest.QTest.qWait(1000)
+        app.processEvents()
+        
+    end = timer()
+    print(end - start) # Time in seconds, e.g. 5.38091952400282
+###############################################################################
+else:
+    fig, ax = plt.subplots()
+    for i in range(10):
+        line = ax.plot(np.random.randn(450))
+    plt.show(block=False)
+    fig.canvas.draw()
+
+    plt.ioff()
+    #run for multiple samples
+    start = timer()
+    for i in range(1):
+        #for every time step
+        for j in range(WINDOW):
+            controller.set_spikes(spike[i,j,:])
+            s,p,v = controller.run_one_step()
+            v_record[i,:,j] = v
+            #reset psp at last step
+            if (j == 450-1):
+                controller.reset_neuron()
+#            if j % 5 == 0:
+            ax.draw_artist(ax.patch)
+            for n, l in enumerate(ax.lines):
+                l.set_ydata( v_record[0,n,:])
+#                
+                ax.draw_artist(l)
+            
+            fig.canvas.update()
+            fig.canvas.flush_events()
+            
+    #plt.show()
+    # ...
+    end = timer()
+    print(end - start) # Time in seconds, e.g. 5.38091952400282
+
+
 
