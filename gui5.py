@@ -7,10 +7,6 @@ Created on Wed Jun 19 21:45:50 2019
 reference
 https://stackoverflow.com/questions/45046239/python-realtime-plot-using-pyqtgraph
 
-
-
-
-
 """
 # Import libraries
 import numpy as np
@@ -18,6 +14,8 @@ from pyqtgraph.Qt import QtGui, QtCore
 import pyqtgraph as pg
 import PyQt5.QtWidgets
 from pyqtgraph.widgets.RemoteGraphicsView import RemoteGraphicsView
+from main_program import *
+from timeit import default_timer as timer
 
 WINDOW = 450
 
@@ -63,7 +61,7 @@ for i in range(22):
 voltage_plot = pg.PlotWidget()
 voltage_lines = []
 for i in range(10):
-    line = voltage_plot.plot(np.random.rand(WINDOW))
+    line = voltage_plot.plot(np.random.rand(WINDOW), pen=colors[i%len(colors)])
     voltage_lines.append(line)
 voltage_plot.plotItem.setTitle('Membrane Potential')
 
@@ -84,28 +82,48 @@ layout = QtGui.QGridLayout()
 w.setLayout(layout)
 
 layout.addLayout(control_panel, 0, 0)   
-#layout.addWidget(text, 1, 0)  
-#layout.addWidget(listw, 2, 0)  
 layout.addWidget(raw_data_plot, 0, 1, 1, 1)  # 
 layout.addWidget(inspike_plot, 0, 2, 1, 1)  # 
 layout.addWidget(psp_plot, 1, 1, 1, 1)  # 
 layout.addWidget(voltage_plot, 1, 2, 1, 1)  # 
 layout.addWidget(outspike_plot, 2, 1, 1, 1)  # 
 
+spike = np.load('D:/islped_demo/snn/noise_train.npy')
+
+test_spike = spike[0]
+controller = neuron_controller(WINDOW, port='COM5', baudrate=230400, timeout=0.1)
+
+v_record = np.zeros([100,10,WINDOW])
+controller.reset_neuron()
+
 def update():
-    
-    for t in range(300):
+    start = timer()
+    voltage = np.zeros([10,WINDOW])
+    psp = np.zeros([110,WINDOW])
+    for t in range(WINDOW):
+        controller.set_spikes(spike[0,t,:])
+        s,p,v = controller.run_one_step()
+        v_record[0,:,t] = v
+        voltage[:,t] = v
+        psp[:,t] = p
+        #reset psp at last step
+        if (t == 450-1):
+            controller.reset_neuron()
+        
         for i in range(22):
             raw_data_lines[i].setData(np.random.random(WINDOW) + i)
-            psp_lines[i].setData(np.random.random(WINDOW) + i)
+            psp_lines[i].setData(psp[::5][i] + i)
 
         for i in range(10):
-            voltage_lines[i].setData(np.random.random(WINDOW) + i)
+            voltage_lines[i].setData(voltage[i,:])
         
         in_scatter.setData(np.random.rand(20), np.random.rand(20))
         out_scatter.setData(np.random.rand(20), np.random.rand(20))
         QtGui.QApplication.processEvents()    # you MUST process the plot now
-
+    end = timer()
+    print(end - start) # Time in seconds, e.g. 5.38091952400282
+        
+        
 btn.clicked.connect(update)
 
 ## Display the widget as a new window
