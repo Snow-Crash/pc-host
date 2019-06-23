@@ -6,6 +6,8 @@ Created on Wed Jun 19 21:45:50 2019
 
 reference
 https://stackoverflow.com/questions/45046239/python-realtime-plot-using-pyqtgraph
+http://www.pyqtgraph.org/documentation/qtcrashcourse.html
+http://www.pyqtgraph.org/downloads/0.10.0/pyqtgraph-0.10.0-deb/pyqtgraph-0.10.0/examples/ScatterPlot.py
 
 """
 # Import libraries
@@ -39,13 +41,17 @@ colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728',
 btn = QtGui.QPushButton('Run')
 text = QtGui.QLineEdit('enter text')
 listw = QtGui.QListWidget()
+#control panel is a container, place widgets in it
 control_panel = QtGui.QVBoxLayout()
 control_panel.addWidget(btn)
 control_panel.addWidget(text)
 control_panel.addWidget(listw)
 
+#This is a container
 raw_data_plot = pg.PlotWidget()
+#list stores references to all 
 raw_data_lines = []
+#insert lines to container
 for i in range(22):
     line = raw_data_plot.plot(np.random.rand(WINDOW), pen=colors[i%len(colors)])
     raw_data_lines.append(line)
@@ -81,6 +87,7 @@ outspike_plot.plotItem.setTitle('Output Spike Train')
 layout = QtGui.QGridLayout()
 w.setLayout(layout)
 
+#add control panel and figures to it
 layout.addLayout(control_panel, 0, 0)   
 layout.addWidget(raw_data_plot, 0, 1, 1, 1)  # 
 layout.addWidget(inspike_plot, 0, 2, 1, 1)  # 
@@ -112,6 +119,7 @@ def update():
         
         for i in range(22):
             raw_data_lines[i].setData(np.random.random(WINDOW) + i)
+            #use setdata instead of plot. setdata is faster
             psp_lines[i].setData(psp[::5][i] + i)
 
         for i in range(10):
@@ -119,7 +127,7 @@ def update():
         
         in_scatter.setData(np.random.rand(20), np.random.rand(20))
         out_scatter.setData(np.random.rand(20), np.random.rand(20))
-        QtGui.QApplication.processEvents()    # you MUST process the plot now
+        QtGui.QApplication.processEvents()    # you MUST process the plot now, othereise no update
     end = timer()
     print(end - start) # Time in seconds, e.g. 5.38091952400282
         
