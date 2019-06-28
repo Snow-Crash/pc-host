@@ -74,8 +74,20 @@ pg.setConfigOptions(antialias=True)
 pg.setConfigOption('background', 'w')
 pg.setConfigOption('foreground', (0, 0, 0))
 
+
+
+# set stylesheet
+file = QtCore.QFile("./qss/light.qss")
+file.open(QtCore.QFile.ReadOnly | QtCore.QFile.Text)
+stream = QtCore.QTextStream(file)
+
+font = QtGui.QFont('Microsoft YaHei', 10)
+tick_font = QtGui.QFont('Microsoft YaHei', 8)
+
 ## Always start by initializing Qt (only once per application)
 app = QtGui.QApplication([])
+#app.setStyleSheet(stream.readAll())
+
 
 ## Define a top-level widget to hold everything
 w = QtGui.QWidget()
@@ -86,11 +98,15 @@ colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728',
 
 ## Create some widgets to be placed inside
 btn = QtGui.QPushButton('Run')
+btn.setFont(font)
 text = QtGui.QLineEdit('enter text')
 listw = QtGui.QListWidget()
 auto_check_box = QtGui.QCheckBox("Auto demo")
+auto_check_box.setFont(font)
 input_class_label = QtGui.QLabel()
+input_class_label.setFont(font)
 dropdown_patterns = pg.ComboBox(items=dropdown_options_dict())
+dropdown_patterns.setFont(font)
 #control panel is a container, place widgets in it
 control_panel = QtGui.QVBoxLayout()
 control_panel.addWidget(btn)
@@ -109,15 +125,26 @@ for i in range(DATA_SELECT_SYNAPSES):
     line = raw_data_plot.plot(np.random.rand(WINDOW), pen=colors[i%len(colors)])
     raw_data_lines.append(line)
 raw_data_plot.plotItem.setTitle('Input stimulus')
+raw_data_plot.plotItem.titleLabel.item.setFont(font)
+raw_data_plot.getAxis("left").tickFont = tick_font
+raw_data_plot.getAxis("bottom").tickFont = tick_font
 
 psp_plot = pg.PlotWidget()
 psp_plot.plotItem.setTitle('PSP')
+psp_plot.plotItem.titleLabel.item.setFont(font)
+psp_plot.getAxis("left").tickFont = tick_font
+psp_plot.getAxis("bottom").tickFont = tick_font
+
 psp_lines = []
 for i in range(DATA_SELECT_SYNAPSES):
     line = psp_plot.plot(np.random.rand(WINDOW))
     psp_lines.append(line)
 
 voltage_plot = pg.PlotWidget()
+voltage_plot.plotItem.titleLabel.item.setFont(font)
+voltage_plot.getAxis("left").tickFont = tick_font
+voltage_plot.getAxis("bottom").tickFont = tick_font
+
 voltage_lines = []
 for i in range(DATA_SELECT_NEURONS):
     line = voltage_plot.plot(np.random.rand(WINDOW), pen=colors[i%len(colors)])
@@ -125,6 +152,9 @@ for i in range(DATA_SELECT_NEURONS):
 voltage_plot.plotItem.setTitle('Membrane Potential')
 
 inspike_plot = pg.PlotWidget()
+inspike_plot.plotItem.titleLabel.item.setFont(font)
+inspike_plot.getAxis("left").tickFont = tick_font
+inspike_plot.getAxis("bottom").tickFont = tick_font
 
 in_scatter = pg.ScatterPlotItem(size=10, pen=pg.mkPen(None), brush=pg.mkBrush(0, 0, 0, 120))
 #in_scatter.addPoints([-5], [-5])
@@ -134,6 +164,10 @@ inspike_plot.setXRange(0, WINDOW, padding=0)
 inspike_plot.setYRange(-0.5, DATA_SELECT_SYNAPSES + 0.5, padding=0)
 
 outspike_plot = pg.PlotWidget()
+outspike_plot.plotItem.titleLabel.item.setFont(font)
+outspike_plot.getAxis("left").tickFont = tick_font
+outspike_plot.getAxis("bottom").tickFont = tick_font
+
 out_scatter = pg.ScatterPlotItem(size=10, pen=pg.mkPen(None), brush=pg.mkBrush(0, 0, 0, 120))
 #out_scatter.addPoints([-5], [-5])
 outspike_plot.addItem(out_scatter)
