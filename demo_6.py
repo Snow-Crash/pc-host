@@ -24,19 +24,8 @@ import time
 from collections import OrderedDict
 
 
-
-
-def classid2sampleidx(drop_down_value):
-    #find all samples of this class
-    selected_class = unique_label[drop_down_value]
-    candidate_sample_idx = np.where(labels == selected_class)[0]
-    print(candidate_sample_idx)
-    #randomly pick one
-    seleted_sample_idx = np.random.choice(candidate_sample_idx)
-    print(seleted_sample_idx)  
-    return seleted_sample_idx
-
 ploting_queue = Queue()
+info_queue = Queue()
 
 # Constants
 # Experiment Constants
@@ -44,9 +33,11 @@ WINDOW = 450
 SYNAPSES = 110
 NEURONS = 10
 PATTERNS = 10
+
 PREPROCESSED_SPIKE_LOCATION = 'D:/islped_demo/snn/noise_train.npy'
 RAW_DATA_LOCATION = 'D:/islped_demo/snn/interpolated_raw_data.npy'
-LEBEL_LOCATION = 'D:/islped_demo/snn/noise_train_id.npy'
+LABEL_LOCATION = 'D:/islped_demo/snn/noise_train_id.npy'
+
 
 # UART Com Settings
 UART_PORT = 'COM5'
@@ -59,7 +50,7 @@ UART_TIMEOUT = 0.1
 DATA_SELECT_SYNAPSES = 22
 DATA_SELECT_NEURONS = 10
 
-selected_synapse = np.arange(0,110,5)
+selected_synapses_idx = np.arange(0, 110, 5)
 
 # GUI
 def dropdown_options_dict():
@@ -73,8 +64,6 @@ pg.setConfigOptions(antialias=True)
 #pg.setConfigOptions(useOpenGL=True)
 pg.setConfigOption('background', 'w')
 pg.setConfigOption('foreground', (0, 0, 0))
-
-
 
 # set stylesheet
 file = QtCore.QFile("./qss/light.qss")
@@ -188,19 +177,36 @@ layout.addWidget(voltage_plot, 2, 3, 2, 2)  #
 layout.addWidget(outspike_plot, 4, 1, 2, 2)  #
 
 
+def classid2sampleidx(drop_down_value):
+    #find all samples of this class
+    selected_class = unique_label[drop_down_value]
+    candidate_sample_idx = np.where(labels == selected_class)[0]
+    # print(candidate_sample_idx)
+    #randomly pick one
+    selected_sample_idx = np.random.choice(candidate_sample_idx)
+    # print(selected_sample_idx)
+    return selected_sample_idx
+
+
 def send_recieve_packages():
     # voltage = np.zeros([10,WINDOW])
     # psp = np.zeros([110,WINDOW])
+    
     start = timer()
-    global current_pattern
+#    global current_pattern # Allows for communication between Comm. Loop and Plotting Loop
+#    global selected_sample_idx
     current_pattern = dropdown_patterns.value()
     while True:
-        seleted_sample_idx = classid2sampleidx(current_pattern)
-        print(seleted_sample_idx)
+        selected_sample_idx = classid2sampleidx(current_pattern)
+        print('send current', current_pattern, 'select', selected_sample_idx)
+
+        info_queue.put((current_pattern, selected_sample_idx))
+
         input_class_label.setText("Current Running Pattern :" + current_pattern.__str__()+ "\n Step :" )
+        # print("Current Pattern: {}".format(current_pattern))
         listw.insertItem(0, "Start Pattern: " + current_pattern.__str__())
         for t in range(WINDOW):   
-            controller.set_spikes(spike[seleted_sample_idx, t, :])
+            controller.set_spikes(spike[selected_sample_idx, t, :])
 #            controller.set_spikes(spike[current_pattern, t, :])
             s, p, v = controller.run_one_step()
             merge_data = [s, p, v, t]
@@ -215,27 +221,37 @@ def send_recieve_packages():
         # Wait to allow for observation of complete run
         time.sleep(3.0)
         current_pattern = np.random.randint(0, high=PATTERNS)
-        seleted_sample_idx = classid2sampleidx(current_pattern)
-        print(seleted_sample_idx)
+        selected_sample_idx = classid2sampleidx(current_pattern)
+#        print(selected_sample_idx)
+
         
     print(timer() - start)
 
 
 def btn_clicked_function():
     send_receive = threading.Thread(target=send_recieve_packages)
-    send_receive.daemon = True
+    send_receive.daemon = False
     send_receive.start()
 
 
 def update():
+    
+#    global current_pattern # Allows for communication between Comm. Loop and Plotting Loop
+#    global selected_sample_idx
+
+    
     voltage = np.zeros([NEURONS, WINDOW])
     psp = np.zeros([SYNAPSES, WINDOW])
     out_spikes = np.zeros([NEURONS, WINDOW])
     raw_data = np.zeros([22, WINDOW])
-#    in_scatter_points = np
     last_t = 0
     current_t = 0
     while True:
+        while not info_queue.empty():
+            current_pattern, selected_sample_idx = info_queue.get()
+            print('update current', current_pattern)
+            print('update selected', selected_sample_idx)
+        
         while not ploting_queue.empty():
             merge_data = ploting_queue.get()
             s, p, v, t = merge_data
@@ -266,59 +282,64 @@ def update():
 #                    raw_data_lines[i].setData(spike[current_pattern, 0:current_t, i] + i * 1000)
 #                    psp_lines[i].setData(psp[::5][i] + i)
         
-            raw_data[:,:t] = raw_input[0,:,:t]
-        
-        for i in range(DATA_SELECT_SYNAPSES):
+            raw_data[:, :t] = raw_input[selected_sample_idx, :, :t]
+
+        # Synapse Plotting
+        x = []
+        y = []
+        sc = 0
+        for i, syn_idx in enumerate(selected_synapses_idx):
+#        for i in range(DATA_SELECT_SYNAPSES):
 #        for i,idx in enumerate(selected_synapse):
             # use setdata instead of plot. setdata is faster
             # raw_data_lines[i].setData(np.random.random(WINDOW) + i)
 #            raw_data_lines[i].setData(spike[current_pattern, 0:current_t, i] + i * 1000)
+#            print("psp shape", psp.shape)
+#            print("psp[::5] shape", psp[::5].shape)
             raw_data_lines[i].setData(raw_data[i])
             psp_lines[i].setData(psp[::5][i] + i)
 #            print(i, idx)
             # Plotting Input Spikes
 #        for i in range(SYNAPSES):
             if current_t > last_t:
-                x = []
-                y = []
-                sc = 0
                 for step in range(last_t, current_t):
-                    if spike[current_pattern, step, i] > 0:
+                    if spike[selected_sample_idx, step, syn_idx] > 0:
                         x.append(step)
                         y.append(i)
                         sc += 1
-                if sc > 0:
-                    in_scatter.addPoints(x, y)
+        if sc > 0:
+            in_scatter.addPoints(x=x, y=y)
 
+        # Neuron Plotting
+        x = []
+        y = []
+        sc = 0
         for i in range(DATA_SELECT_NEURONS):
             voltage_lines[i].setData(voltage[i, :])
             # Plotting Output Spikes
             if current_t > last_t:
-                x = []
-                y = []
-                sc = 0
                 for step in range(last_t, current_t):
                     if out_spikes[i][step] > 0:
                         x.append(step)
                         y.append(i)
                         sc += 1
-                if sc > 0:
-                    out_scatter.addPoints(x, y)
+        if sc > 0:
+            out_scatter.addPoints(x=x, y=y)
 
-        # in_scatter.setData(np.random.rand(20), np.random.rand(20))
-        # out_scatter.setData(np.random.rand(20), np.random.rand(20))
         last_t = current_t
         QtGui.QApplication.processEvents()    # you MUST process the plot now, otherwise no update
         time.sleep(0.3)
 
 
-current_pattern = 0
+# Allows for communication between Comm. Loop and Plotting Loop
+#current_pattern = 0
+#selected_sample_idx = 0
 
 btn.clicked.connect(btn_clicked_function)
 
 spike = np.load(PREPROCESSED_SPIKE_LOCATION)
 raw_input = np.load(RAW_DATA_LOCATION)
-labels = np.load(LEBEL_LOCATION)
+labels = np.load(LABEL_LOCATION)
 unique_label = np.unique(labels)
 
 
