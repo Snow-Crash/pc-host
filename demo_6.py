@@ -220,6 +220,10 @@ def send_recieve_packages():
             for n in range(s.__len__()):
                 if s[n] > 0:
                     listw.insertItem(0, "Spike Detected! Neuron: {}, Step: {} ".format(n, t))
+            # Reset psp at last step
+            if (t == 450-1):
+                controller.reset_neuron()
+                
         listw.insertItem(0, "End Pattern: " + current_pattern.__str__())
         if not auto_check_box.checkState():
             break
@@ -279,10 +283,7 @@ def update():
                 out_scatter.setData([-5], [-5])
 #                in_scatter.clear()
 #                out_scatter.clear()
-                
-            # Reset psp at last step
-            if (t == 450-1):
-                controller.reset_neuron()
+
             
             #reset all data at the begining of each run
             if t == 0:
