@@ -33,6 +33,14 @@ WINDOW = 450
 SYNAPSES = 110
 NEURONS = 10
 PATTERNS = 10
+SLIDING_WINDOW = 100
+DATA_PLOT_RANGE = WINDOW
+
+USE_SLIDING_WINDOW = False
+
+if USE_SLIDING_WINDOW:
+    DATA_PLOT_RANGE = SLIDING_WINDOW
+
 
 PREPROCESSED_SPIKE_LOCATION = 'D:/islped_demo/snn/noise_train.npy'
 RAW_DATA_LOCATION = 'D:/islped_demo/snn/interpolated_raw_data.npy'
@@ -111,7 +119,7 @@ raw_data_plot = pg.PlotWidget()
 raw_data_lines = []
 #insert lines to container
 for i in range(DATA_SELECT_SYNAPSES):
-    line = raw_data_plot.plot(np.random.rand(WINDOW), pen=colors[i%len(colors)])
+    line = raw_data_plot.plot(np.random.rand(DATA_PLOT_RANGE), pen=colors[i%len(colors)])
     raw_data_lines.append(line)
 raw_data_plot.plotItem.setTitle('Input stimulus')
 raw_data_plot.plotItem.titleLabel.item.setFont(font)
@@ -126,7 +134,7 @@ psp_plot.getAxis("bottom").tickFont = tick_font
 
 psp_lines = []
 for i in range(DATA_SELECT_SYNAPSES):
-    line = psp_plot.plot(np.random.rand(WINDOW), pen=colors[i%len(colors)])
+    line = psp_plot.plot(np.random.rand(DATA_PLOT_RANGE), pen=colors[i%len(colors)])
     psp_lines.append(line)
 
 voltage_plot = pg.PlotWidget()
@@ -136,7 +144,7 @@ voltage_plot.getAxis("bottom").tickFont = tick_font
 
 voltage_lines = []
 for i in range(DATA_SELECT_NEURONS):
-    line = voltage_plot.plot(np.random.rand(WINDOW), pen=colors[i%len(colors)])
+    line = voltage_plot.plot(np.random.rand(DATA_PLOT_RANGE), pen=colors[i%len(colors)])
     voltage_lines.append(line)
 voltage_plot.plotItem.setTitle('Membrane Potential')
 
@@ -232,12 +240,13 @@ def btn_clicked_function():
 
 def update():
     
-    voltage = np.zeros([NEURONS, WINDOW])
-    psp = np.zeros([SYNAPSES, WINDOW])
+    voltage = np.zeros([NEURONS, DATA_PLOT_RANGE])
+    psp = np.zeros([SYNAPSES, DATA_PLOT_RANGE])
     out_spikes = np.zeros([NEURONS, WINDOW])
-    raw_data = np.zeros([22, WINDOW])
+    raw_data = np.zeros([22, DATA_PLOT_RANGE])
     last_t = 0
     current_t = 0
+    ptr = 0
     while True:
         while not info_queue.empty():
             current_pattern, selected_sample_idx = info_queue.get()
@@ -248,8 +257,20 @@ def update():
             merge_data = ploting_queue.get()
             s, p, v, t = merge_data
             v_record[0, :, t] = v
-            voltage[:, t] = v
-            psp[:, t] = p
+            ptr += 1
+            if USE_SLIDING_WINDOW:
+                voltage[:,0:-1] = voltage[:,1:]
+                psp[:,0:-1] = psp[:,1:]
+                raw_data[:, 0:-1] = raw_data[:,1:]
+                
+                voltage[:, -1] = v
+                psp[:, -1] = p
+                raw_data[:, -1] = raw_input[selected_sample_idx, :, t]
+            else:
+                voltage[:, t] = v
+                psp[:, t] = p
+                raw_data[:, :t] = raw_input[selected_sample_idx, :, :t]
+            
             out_spikes[:, t] = s
             current_t = t
             if t < last_t:
@@ -265,14 +286,11 @@ def update():
             
             #reset all data at the begining of each run
             if t == 0:
-                pass
-                voltage = np.zeros([NEURONS, WINDOW])
-                psp = np.zeros([SYNAPSES, WINDOW])
                 out_spikes = np.zeros([NEURONS, WINDOW])
-                raw_data = np.zeros([22, WINDOW])
+                voltage = np.zeros([NEURONS, DATA_PLOT_RANGE])
+                psp = np.zeros([SYNAPSES, DATA_PLOT_RANGE])
+                raw_data = np.zeros([22, DATA_PLOT_RANGE])
 
-        
-            raw_data[:, :t] = raw_input[selected_sample_idx, :, :t]
 
         # Synapse Plotting
         x = []
@@ -311,7 +329,7 @@ def update():
 
         last_t = current_t
         QtGui.QApplication.processEvents()    # you MUST process the plot now, otherwise no update
-        time.sleep(0.3)
+        time.sleep(0.2)
 
 
 btn.clicked.connect(btn_clicked_function)
