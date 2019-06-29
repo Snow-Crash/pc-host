@@ -290,6 +290,7 @@ def update():
                 voltage = np.zeros([NEURONS, DATA_PLOT_RANGE])
                 psp = np.zeros([SYNAPSES, WINDOW])
                 raw_data = np.zeros([22, DATA_PLOT_RANGE])
+                ptr = -SLIDING_WINDOW
 
 
         # Synapse Plotting
@@ -305,6 +306,7 @@ def update():
             if USE_SLIDING_WINDOW:
 #                psp_lines[i].setPos(ptr, 0)
                 raw_data_lines[i].setPos(ptr, 0)
+
             # Plotting Input Spikes
             if current_t > last_t:
                 for step in range(last_t, current_t):
@@ -319,6 +321,7 @@ def update():
         x = []
         y = []
         sc = 0
+        
         for i in range(DATA_SELECT_NEURONS):
             
             if USE_SLIDING_WINDOW:
