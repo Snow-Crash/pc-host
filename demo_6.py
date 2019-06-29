@@ -175,7 +175,8 @@ layout.addWidget(inspike_plot, 0, 3, 2, 2)  #
 layout.addWidget(psp_plot, 2, 1, 2, 2)  #
 layout.addWidget(voltage_plot, 2, 3, 2, 2)  #
 layout.addWidget(outspike_plot, 4, 1, 2, 2)  #
-
+layout.setSpacing(30)
+layout.setMargin(30)
 
 def classid2sampleidx(drop_down_value):
     #find all samples of this class
