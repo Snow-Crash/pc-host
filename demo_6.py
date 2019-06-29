@@ -66,9 +66,9 @@ pg.setConfigOption('background', 'w')
 pg.setConfigOption('foreground', (0, 0, 0))
 
 # set stylesheet
-file = QtCore.QFile("./qss/light.qss")
-file.open(QtCore.QFile.ReadOnly | QtCore.QFile.Text)
-stream = QtCore.QTextStream(file)
+#file = QtCore.QFile("./qss/light.qss")
+#file.open(QtCore.QFile.ReadOnly | QtCore.QFile.Text)
+#stream = QtCore.QTextStream(file)
 
 font = QtGui.QFont('Microsoft YaHei', 10)
 tick_font = QtGui.QFont('Microsoft YaHei', 8)
