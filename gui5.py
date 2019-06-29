@@ -27,6 +27,10 @@ pg.setConfigOption('background', 'w')
 pg.setConfigOption('foreground', (0, 0, 0))
 
 
+font = QtGui.QFont('Microsoft YaHei', 12)
+tick_font = QtGui.QFont('Microsoft YaHei', 8)
+#frame =  QtGui.QFrame
+
 ## Always start by initializing Qt (only once per application)
 app = QtGui.QApplication([])
 
@@ -39,13 +43,18 @@ colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728',
 
 ## Create some widgets to be placed inside
 btn = QtGui.QPushButton('Run')
+btn.setFont(font)
 text = QtGui.QLineEdit('enter text')
 listw = QtGui.QListWidget()
+audo_check_box = QtGui.QCheckBox("Auto demo")
+input_class_label = QtGui.QLabel()
 #control panel is a container, place widgets in it
 control_panel = QtGui.QVBoxLayout()
 control_panel.addWidget(btn)
 control_panel.addWidget(text)
 control_panel.addWidget(listw)
+control_panel.addWidget(audo_check_box)
+control_panel.addWidget(input_class_label)
 
 #This is a container
 raw_data_plot = pg.PlotWidget()
@@ -56,9 +65,18 @@ for i in range(22):
     line = raw_data_plot.plot(np.random.rand(WINDOW), pen=colors[i%len(colors)])
     raw_data_lines.append(line)
 raw_data_plot.plotItem.setTitle('Input stimulus')
+raw_data_plot.plotItem.titleLabel.item.setFont(font)
+raw_data_plot.getAxis("bottom").tickFont = tick_font
+raw_data_plot.getAxis("left").tickFont = tick_font
 
 psp_plot = pg.PlotWidget()
 psp_plot.plotItem.setTitle('PSP')
+psp_plot.plotItem.titleLabel.item.setFont(font)
+psp_plot.setFrameStyle(QtGui.QFrame.Panel | QtGui.QFrame.Plain)
+psp_plot.setLineWidth(3)
+psp_plot.setObjectName("psp_plot")
+psp_plot.setStyleSheet("#psp_plot { border: 1px solid black; }")
+
 psp_lines = []
 for i in range(22):
     line = psp_plot.plot(np.random.rand(WINDOW))
@@ -70,18 +88,22 @@ for i in range(10):
     line = voltage_plot.plot(np.random.rand(WINDOW), pen=colors[i%len(colors)])
     voltage_lines.append(line)
 voltage_plot.plotItem.setTitle('Membrane Potential')
+#voltage_plot.plotItem.titleLabel.setFont(font)
+voltage_plot.plotItem.titleLabel.item.setFont(font)
 
 inspike_plot = pg.PlotWidget()
 in_scatter = pg.ScatterPlotItem(size=10, pen=pg.mkPen(None), brush=pg.mkBrush(0, 0, 0, 120))
 in_scatter.addPoints(np.random.rand(20), np.random.rand(20))
 inspike_plot.addItem(in_scatter)
 inspike_plot.plotItem.setTitle('Input Spike Train')
+inspike_plot.plotItem.titleLabel.item.setFont(font)
 
 outspike_plot = pg.PlotWidget()
 out_scatter = pg.ScatterPlotItem(size=10, pen=pg.mkPen(None), brush=pg.mkBrush(0, 0, 0, 120))
 out_scatter.addPoints(np.random.rand(20), np.random.rand(20))
 outspike_plot.addItem(out_scatter)
 outspike_plot.plotItem.setTitle('Output Spike Train')
+outspike_plot.plotItem.titleLabel.item.setFont(font)
 
 ## Create a grid layout to manage the widgets size and position
 layout = QtGui.QGridLayout()
