@@ -36,7 +36,7 @@ PATTERNS = 10
 SLIDING_WINDOW = 100
 DATA_PLOT_RANGE = WINDOW
 
-USE_SLIDING_WINDOW = False
+USE_SLIDING_WINDOW = True
 
 if USE_SLIDING_WINDOW:
     DATA_PLOT_RANGE = SLIDING_WINDOW
@@ -241,12 +241,12 @@ def btn_clicked_function():
 def update():
     
     voltage = np.zeros([NEURONS, DATA_PLOT_RANGE])
-    psp = np.zeros([SYNAPSES, DATA_PLOT_RANGE])
+    psp = np.zeros([SYNAPSES, WINDOW])
     out_spikes = np.zeros([NEURONS, WINDOW])
     raw_data = np.zeros([22, DATA_PLOT_RANGE])
     last_t = 0
     current_t = 0
-    ptr = 0
+    ptr = -SLIDING_WINDOW
     while True:
         while not info_queue.empty():
             current_pattern, selected_sample_idx = info_queue.get()
@@ -260,21 +260,21 @@ def update():
             ptr += 1
             if USE_SLIDING_WINDOW:
                 voltage[:,0:-1] = voltage[:,1:]
-                psp[:,0:-1] = psp[:,1:]
+#                psp[:,0:-1] = psp[:,1:]
                 raw_data[:, 0:-1] = raw_data[:,1:]
                 
                 voltage[:, -1] = v
-                psp[:, -1] = p
+#                psp[:, -1] = p
                 raw_data[:, -1] = raw_input[selected_sample_idx, :, t]
             else:
                 voltage[:, t] = v
-                psp[:, t] = p
+#                psp[:, t] = p
                 raw_data[:, :t] = raw_input[selected_sample_idx, :, :t]
             
+            psp[:, t] = p
             out_spikes[:, t] = s
             current_t = t
             if t < last_t:
-                last_t = 0
                 in_scatter.setData([-5], [-5])
                 out_scatter.setData([-5], [-5])
 #                in_scatter.clear()
@@ -288,7 +288,7 @@ def update():
             if t == 0:
                 out_spikes = np.zeros([NEURONS, WINDOW])
                 voltage = np.zeros([NEURONS, DATA_PLOT_RANGE])
-                psp = np.zeros([SYNAPSES, DATA_PLOT_RANGE])
+                psp = np.zeros([SYNAPSES, WINDOW])
                 raw_data = np.zeros([22, DATA_PLOT_RANGE])
 
 
@@ -301,6 +301,10 @@ def update():
             # raw_data_lines[i].setData(np.random.random(WINDOW) + i)
             raw_data_lines[i].setData(raw_data[i])
             psp_lines[i].setData(psp[::5][i] + i)
+        
+            if USE_SLIDING_WINDOW:
+#                psp_lines[i].setPos(ptr, 0)
+                raw_data_lines[i].setPos(ptr, 0)
             # Plotting Input Spikes
             if current_t > last_t:
                 for step in range(last_t, current_t):
@@ -316,7 +320,12 @@ def update():
         y = []
         sc = 0
         for i in range(DATA_SELECT_NEURONS):
+            
+            if USE_SLIDING_WINDOW:
+                voltage_lines[i].setPos(ptr, 0)
+                
             voltage_lines[i].setData(voltage[i, :])
+            
             # Plotting Output Spikes
             if current_t > last_t:
                 for step in range(last_t, current_t):
