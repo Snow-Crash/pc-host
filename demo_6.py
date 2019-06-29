@@ -126,7 +126,7 @@ psp_plot.getAxis("bottom").tickFont = tick_font
 
 psp_lines = []
 for i in range(DATA_SELECT_SYNAPSES):
-    line = psp_plot.plot(np.random.rand(WINDOW))
+    line = psp_plot.plot(np.random.rand(WINDOW), pen=colors[i%len(colors)])
     psp_lines.append(line)
 
 voltage_plot = pg.PlotWidget()
