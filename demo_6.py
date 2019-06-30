@@ -96,7 +96,7 @@ colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728',
 ## Create some widgets to be placed inside
 btn = QtGui.QPushButton('Run')
 btn.setFont(font)
-text = QtGui.QLineEdit('enter text')
+# text = QtGui.QLineEdit('enter text')
 listw = QtGui.QListWidget()
 auto_check_box = QtGui.QCheckBox("Auto demo")
 auto_check_box.setFont(font)
@@ -108,7 +108,7 @@ dropdown_patterns.setFont(font)
 control_panel = QtGui.QVBoxLayout()
 control_panel.addWidget(btn)
 control_panel.addWidget(dropdown_patterns)
-control_panel.addWidget(text)
+# control_panel.addWidget(text)
 control_panel.addWidget(listw)
 control_panel.addWidget(auto_check_box)
 control_panel.addWidget(input_class_label)
@@ -141,6 +141,7 @@ voltage_plot = pg.PlotWidget()
 voltage_plot.plotItem.titleLabel.item.setFont(font)
 voltage_plot.getAxis("left").tickFont = tick_font
 voltage_plot.getAxis("bottom").tickFont = tick_font
+voltage_plot.plotItem.setYRange(-5,1.5)
 
 voltage_lines = []
 for i in range(DATA_SELECT_NEURONS):
