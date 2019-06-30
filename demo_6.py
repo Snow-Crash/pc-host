@@ -93,9 +93,14 @@ colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728',
               '#9467bd', '#8c564b', '#e377c2', '#7f7f7f',
               '#bcbd22', '#17becf']
 
+
+btn_background = QtGui.QPixmap('./images/start.png')
 ## Create some widgets to be placed inside
 btn = QtGui.QPushButton('Run')
 btn.setFont(font)
+btn.setIcon(QtGui.QIcon(btn_background))
+#btn.setIconSize(btn_background.rect().size());
+btn.setIconSize(QtCore.QSize(128, 128));
 # text = QtGui.QLineEdit('enter text')
 listw = QtGui.QListWidget()
 auto_check_box = QtGui.QCheckBox("Auto demo")
