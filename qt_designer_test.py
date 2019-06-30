@@ -252,7 +252,7 @@ def update():
     voltage = np.zeros([NEURONS, DATA_PLOT_RANGE])
     psp = np.zeros([SYNAPSES, WINDOW])
     out_spikes = np.zeros([NEURONS, WINDOW])
-    raw_data = np.zeros([22, DATA_PLOT_RANGE])
+    raw_data = np.zeros([22, WINDOW])
     last_t = 0
     current_t = 0
     ptr = -SLIDING_WINDOW
@@ -270,16 +270,17 @@ def update():
             if USE_SLIDING_WINDOW:
                 voltage[:,0:-1] = voltage[:,1:]
 #                psp[:,0:-1] = psp[:,1:]
-                raw_data[:, 0:-1] = raw_data[:,1:]
+#                raw_data[:, 0:-1] = raw_data[:,1:]
                 
                 voltage[:, -1] = v
 #                psp[:, -1] = p
-                raw_data[:, -1] = raw_input[selected_sample_idx, :, t]
+#                raw_data[:, -1] = raw_input[selected_sample_idx, :, t]
             else:
                 voltage[:, t] = v
 #                psp[:, t] = p
-                raw_data[:, :t] = raw_input[selected_sample_idx, :, :t]
-
+#                raw_data[:, :t] = raw_input[selected_sample_idx, :, :t]
+            
+            raw_data[:, t] = raw_input[selected_sample_idx, :, t]
             psp[:, t] = p
             out_spikes[:, t] = s
             current_t = t
@@ -296,7 +297,7 @@ def update():
                 out_spikes = np.zeros([NEURONS, WINDOW])
                 voltage = np.zeros([NEURONS, DATA_PLOT_RANGE])
                 psp = np.zeros([SYNAPSES, WINDOW])
-                raw_data = np.zeros([22, DATA_PLOT_RANGE])
+                raw_data = np.zeros([22, WINDOW])
                 ptr = -SLIDING_WINDOW
 
 
@@ -310,9 +311,9 @@ def update():
             raw_data_lines[i].setData(raw_data[i])
             psp_lines[i].setData(psp[::5][i] + i)
 
-            if USE_SLIDING_WINDOW:
+#            if USE_SLIDING_WINDOW:
 #                psp_lines[i].setPos(ptr, 0)
-                raw_data_lines[i].setPos(ptr, 0)
+#                raw_data_lines[i].setPos(ptr, 0)
 
             if current_t > last_t:
                 for step in range(last_t, current_t):
@@ -329,6 +330,7 @@ def update():
         sc = 0
         for i in range(DATA_SELECT_NEURONS):
             voltage_lines[i].setData(voltage[i, :])
+            voltage_lines[i].setPos(ptr,0)
             # Plotting Output Spikes
             if current_t > last_t:
                 for step in range(last_t, current_t):
