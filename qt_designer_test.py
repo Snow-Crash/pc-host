@@ -95,6 +95,8 @@ colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728',
               '#9467bd', '#8c564b', '#e377c2', '#7f7f7f',
               '#bcbd22', '#17becf']
 
+axis_color = QtGui.QPen(QtGui.QColor(99, 100, 102))
+
 #
 banner_logo_img = QtGui.QPixmap('./images/eng_logo_2.png')
 window.banner_logo.setPixmap(banner_logo_img.scaled(QtCore.QSize(250, 300),
@@ -143,12 +145,16 @@ for i in range(DATA_SELECT_SYNAPSES):
 window.raw_data_plot.plotItem.titleLabel.item.setFont(font)
 window.raw_data_plot.getAxis("left").tickFont = tick_font
 window.raw_data_plot.getAxis("bottom").tickFont = tick_font
+window.raw_data_plot.getAxis("left").setPen(axis_color)
+window.raw_data_plot.getAxis("bottom").setPen(axis_color)
 
 
 window.psp_plot.plotItem.setTitle('PSP')
 window.psp_plot.plotItem.titleLabel.item.setFont(font)
 window.psp_plot.getAxis("left").tickFont = tick_font
 window.psp_plot.getAxis("bottom").tickFont = tick_font
+window.psp_plot.getAxis("left").setPen(axis_color)
+window.psp_plot.getAxis("bottom").setPen(axis_color)
 
 psp_lines = []
 for i in range(DATA_SELECT_SYNAPSES):
@@ -159,6 +165,8 @@ for i in range(DATA_SELECT_SYNAPSES):
 window.voltage_plot.plotItem.titleLabel.item.setFont(font)
 window.voltage_plot.getAxis("left").tickFont = tick_font
 window.voltage_plot.getAxis("bottom").tickFont = tick_font
+window.voltage_plot.getAxis("left").setPen(axis_color)
+window.voltage_plot.getAxis("bottom").setPen(axis_color)
 window.voltage_plot.plotItem.setYRange(-5,1.5)
 
 voltage_lines = []
@@ -171,6 +179,8 @@ for i in range(DATA_SELECT_NEURONS):
 window.inspike_plot.plotItem.titleLabel.item.setFont(font)
 window.inspike_plot.getAxis("left").tickFont = tick_font
 window.inspike_plot.getAxis("bottom").tickFont = tick_font
+window.inspike_plot.getAxis("left").setPen(axis_color)
+window.inspike_plot.getAxis("bottom").setPen(axis_color)
 
 in_scatter = pg.ScatterPlotItem(size=10, pen=pg.mkPen(None), brush=pg.mkBrush(0, 0, 0, 120))
 #in_scatter.addPoints([-5], [-5])
@@ -182,6 +192,10 @@ window.inspike_plot.setYRange(-0.5, DATA_SELECT_SYNAPSES + 0.5, padding=0)
 window.outspike_plot.plotItem.titleLabel.item.setFont(font)
 window.outspike_plot.getAxis("left").tickFont = tick_font
 window.outspike_plot.getAxis("bottom").tickFont = tick_font
+window.outspike_plot.getAxis("left").setPen(axis_color)
+window.outspike_plot.getAxis("bottom").setPen(axis_color)
+window.outspike_plot.setXRange(0, WINDOW, padding=0)
+window.inspike_plot.setYRange(0, 22, padding=0)
 
 out_scatter = pg.ScatterPlotItem(size=10, pen=pg.mkPen(None), brush=pg.mkBrush(0, 0, 0, 120))
 #out_scatter.addPoints([-5], [-5])
