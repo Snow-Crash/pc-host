@@ -139,7 +139,7 @@ raw_data_lines = []
 for i in range(DATA_SELECT_SYNAPSES):
     line = window.raw_data_plot.plot(np.random.rand(DATA_PLOT_RANGE), pen=colors[i%len(colors)])
     raw_data_lines.append(line)
-window.raw_data_plot.plotItem.setTitle('Input stimulus')
+#window.raw_data_plot.plotItem.setTitle('Input stimulus')
 window.raw_data_plot.plotItem.titleLabel.item.setFont(font)
 window.raw_data_plot.getAxis("left").tickFont = tick_font
 window.raw_data_plot.getAxis("bottom").tickFont = tick_font
