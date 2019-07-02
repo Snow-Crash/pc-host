@@ -135,6 +135,10 @@ window.dropdown_patterns.setItems(dropdown_options_dict())
 
 
 
+window.input_class_value.setText("-")
+window.output_class_value.setText("-")
+window.spike_count_value.setText("-")
+
 #list stores references to all 
 raw_data_lines = []
 #insert lines to container
@@ -149,7 +153,7 @@ window.raw_data_plot.getAxis("left").setPen(axis_color)
 window.raw_data_plot.getAxis("bottom").setPen(axis_color)
 
 
-window.psp_plot.plotItem.setTitle('PSP')
+#window.psp_plot.plotItem.setTitle('PSP')
 window.psp_plot.plotItem.titleLabel.item.setFont(font)
 window.psp_plot.getAxis("left").tickFont = tick_font
 window.psp_plot.getAxis("bottom").tickFont = tick_font
@@ -185,7 +189,7 @@ window.inspike_plot.getAxis("bottom").setPen(axis_color)
 in_scatter = pg.ScatterPlotItem(size=10, pen=pg.mkPen(None), brush=pg.mkBrush(0, 0, 0, 120))
 #in_scatter.addPoints([-5], [-5])
 window.inspike_plot.addItem(in_scatter)
-window.inspike_plot.plotItem.setTitle('Input Spike Train')
+#window.inspike_plot.plotItem.setTitle('Input Spike Train')
 window.inspike_plot.setXRange(0, WINDOW, padding=0)
 window.inspike_plot.setYRange(-0.5, DATA_SELECT_SYNAPSES + 0.5, padding=0)
 
@@ -200,7 +204,7 @@ window.inspike_plot.setYRange(0, 22, padding=0)
 out_scatter = pg.ScatterPlotItem(size=10, pen=pg.mkPen(None), brush=pg.mkBrush(0, 0, 0, 120))
 #out_scatter.addPoints([-5], [-5])
 window.outspike_plot.addItem(out_scatter)
-window.outspike_plot.plotItem.setTitle('Output Spike Train')
+#window.outspike_plot.plotItem.setTitle('Output Spike Train')
 window.outspike_plot.setXRange(0, WINDOW, padding=0)
 window.outspike_plot.setYRange(-0.5, NEURONS + 0.5, padding=0)
 
@@ -270,6 +274,7 @@ def update():
     last_t = 0
     current_t = 0
     ptr = -SLIDING_WINDOW
+
     while True:
         while not info_queue.empty():
             current_pattern, selected_sample_idx = info_queue.get()
@@ -313,6 +318,11 @@ def update():
                 psp = np.zeros([SYNAPSES, WINDOW])
                 raw_data = np.zeros([22, WINDOW])
                 ptr = -SLIDING_WINDOW
+                window.input_class_value.setText(str(current_pattern))
+            
+            spike_count = spike[selected_sample_idx, :current_t, :].sum()
+            
+            window.spike_count_value.setText('{:4d}'.format(spike_count))
 
 
         # Synapse Plotting
@@ -362,7 +372,9 @@ def update():
 
 window.btn.clicked.connect(btn_clicked_function)
 
-spike = np.load(PREPROCESSED_SPIKE_LOCATION)
+spike = np.load(PREPROCESSED_SPIKE_LOCATION)/1000
+spike = spike.astype(int)
+
 raw_input = np.load(RAW_DATA_LOCATION)
 labels = np.load(LABEL_LOCATION)
 unique_label = np.unique(labels)
