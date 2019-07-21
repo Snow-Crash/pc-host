@@ -94,21 +94,28 @@ colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728',
               '#bcbd22', '#17becf']
 
 
+control_panel_max_width = 300
 btn_background = QtGui.QPixmap('./images/start.png')
 ## Create some widgets to be placed inside
 btn = QtGui.QPushButton('Run')
 btn.setFont(font)
 btn.setIcon(QtGui.QIcon(btn_background))
 #btn.setIconSize(btn_background.rect().size());
-btn.setIconSize(QtCore.QSize(128, 128));
+btn.setIconSize(QtCore.QSize(64, 64));
+btn.setMaximumWidth(control_panel_max_width)
+
 # text = QtGui.QLineEdit('enter text')
 listw = QtGui.QListWidget()
+listw.setMaximumWidth(control_panel_max_width)
 auto_check_box = QtGui.QCheckBox("Auto demo")
 auto_check_box.setFont(font)
+auto_check_box.setMaximumWidth(control_panel_max_width)
 input_class_label = QtGui.QLabel()
 input_class_label.setFont(font)
+input_class_label.setMaximumWidth(control_panel_max_width)
 dropdown_patterns = pg.ComboBox(items=dropdown_options_dict())
 dropdown_patterns.setFont(font)
+dropdown_patterns.setMaximumWidth(control_panel_max_width)
 #control panel is a container, place widgets in it
 control_panel = QtGui.QVBoxLayout()
 control_panel.addWidget(btn)
@@ -215,6 +222,7 @@ def send_recieve_packages():
 
         input_class_label.setText("Current Running Pattern :" + current_pattern.__str__()+ "\n Step :" )
         # print("Current Pattern: {}".format(current_pattern))
+        listw.clear()
         listw.insertItem(0, "Start Pattern: " + current_pattern.__str__())
         for t in range(WINDOW):   
             controller.set_spikes(spike[selected_sample_idx, t, :])
@@ -287,8 +295,8 @@ def update():
             if t < last_t:
                 in_scatter.setData([-5], [-5])
                 out_scatter.setData([-5], [-5])
-#                in_scatter.clear()
-#                out_scatter.clear()
+                in_scatter.clear()
+                out_scatter.clear()
 
             
             #reset all data at the begining of each run
@@ -298,6 +306,7 @@ def update():
                 psp = np.zeros([SYNAPSES, WINDOW])
                 raw_data = np.zeros([22, DATA_PLOT_RANGE])
                 ptr = -SLIDING_WINDOW
+                
 
 
         # Synapse Plotting
