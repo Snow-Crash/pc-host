@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Jun 29 00:29:06 2019
+Created on Wed Jun 19 21:45:50 2019
 
-@author: hw
+@author: hw, kp, dpr
 """
 
-import sys
-from PyQt5 import QtCore, QtGui, uic
 import numpy as np
-from pyqtgraph.Qt import QtGui, QtCore
+from PyQt5 import QtCore, QtGui, uic
 import pyqtgraph as pg
 import PyQt5.QtWidgets
-from pyqtgraph.widgets.RemoteGraphicsView import RemoteGraphicsView
 from main_program import *
 from timeit import default_timer as timer
 from queue import Queue
 import threading
-import multiprocessing
 import time
 from collections import OrderedDict
+
+
+
+
 
 
 pg.setConfigOptions(antialias=True)
@@ -27,7 +27,7 @@ pg.setConfigOption('background', 'w')
 pg.setConfigOption('foreground', (0, 0, 0))
 ###############################################################################
  
-qtCreatorFile = "ui.ui" # Enter file here.
+qtCreatorFile = "ui_3.ui" # Enter file here.
  
 Ui_MainWindow, QtBaseClass = uic.loadUiType(qtCreatorFile)
  
@@ -102,20 +102,19 @@ banner_logo_img = QtGui.QPixmap('./images/eng_logo_2.png')
 window.banner_logo.setPixmap(banner_logo_img.scaled(QtCore.QSize(250, 300),
                                                     QtCore.Qt.KeepAspectRatio))
 
-#window.buttom_line.setFrameShape(QtGui.QFrame.HLine);
-#window.buttom_line.setFrameShadow(QtGui.QFrame.Plain);
-#window.buttom_line.setLineWidth(2)
-              
-## Create some widgets to be placed inside
-              
+
+
+
+
+
+
 su_logo_background = QtGui.QPixmap('./images/su_logo_white.png')
 window.logo.setPixmap(su_logo_background.scaled(QtCore.QSize(150, 150)))
 window.logo.setAlignment(QtCore.Qt.AlignCenter)
 
-
 window.title_label.setWordWrap(True)
 window.title_label.setFont(font)
-              
+
 btn_background = QtGui.QPixmap('./images/start2.png')
 ## Create some widgets to be placed inside
 window.btn.setFont(font)
@@ -145,7 +144,7 @@ raw_data_lines = []
 for i in range(DATA_SELECT_SYNAPSES):
     line = window.raw_data_plot.plot(np.random.rand(DATA_PLOT_RANGE), pen=colors[i%len(colors)])
     raw_data_lines.append(line)
-#window.raw_data_plot.plotItem.setTitle('Input stimulus')
+
 window.raw_data_plot.plotItem.titleLabel.item.setFont(font)
 window.raw_data_plot.getAxis("left").tickFont = tick_font
 window.raw_data_plot.getAxis("bottom").tickFont = tick_font
@@ -153,7 +152,7 @@ window.raw_data_plot.getAxis("left").setPen(axis_color)
 window.raw_data_plot.getAxis("bottom").setPen(axis_color)
 
 
-#window.psp_plot.plotItem.setTitle('PSP')
+
 window.psp_plot.plotItem.titleLabel.item.setFont(font)
 window.psp_plot.getAxis("left").tickFont = tick_font
 window.psp_plot.getAxis("bottom").tickFont = tick_font
@@ -164,7 +163,6 @@ psp_lines = []
 for i in range(DATA_SELECT_SYNAPSES):
     line = window.psp_plot.plot(np.random.rand(WINDOW), pen=colors[i%len(colors)])
     psp_lines.append(line)
-
 
 window.voltage_plot.plotItem.titleLabel.item.setFont(font)
 window.voltage_plot.getAxis("left").tickFont = tick_font
@@ -189,9 +187,10 @@ window.inspike_plot.getAxis("bottom").setPen(axis_color)
 in_scatter = pg.ScatterPlotItem(size=10, pen=pg.mkPen(None), brush=pg.mkBrush(0, 0, 0, 120))
 #in_scatter.addPoints([-5], [-5])
 window.inspike_plot.addItem(in_scatter)
-#window.inspike_plot.plotItem.setTitle('Input Spike Train')
+# inspike_plot.plotItem.setTitle('Input Spike Train')
 window.inspike_plot.setXRange(0, WINDOW, padding=0)
 window.inspike_plot.setYRange(-0.5, DATA_SELECT_SYNAPSES + 0.5, padding=0)
+
 
 window.outspike_plot.plotItem.titleLabel.item.setFont(font)
 window.outspike_plot.getAxis("left").tickFont = tick_font
@@ -204,7 +203,7 @@ window.inspike_plot.setYRange(0, 22, padding=0)
 out_scatter = pg.ScatterPlotItem(size=10, pen=pg.mkPen(None), brush=pg.mkBrush(0, 0, 0, 120))
 #out_scatter.addPoints([-5], [-5])
 window.outspike_plot.addItem(out_scatter)
-#window.outspike_plot.plotItem.setTitle('Output Spike Train')
+# outspike_plot.plotItem.setTitle('Output Spike Train')
 window.outspike_plot.setXRange(0, WINDOW, padding=0)
 window.outspike_plot.setYRange(-0.5, NEURONS + 0.5, padding=0)
 
@@ -219,16 +218,13 @@ def classid2sampleidx(drop_down_value):
     # print(selected_sample_idx)
     return selected_sample_idx
 
-
 sample_count = 0
 def send_recieve_packages():
     
-    start = timer()
-    current_pattern = window.dropdown_patterns.value()
-
     global sample_count
+    
     sample_count += 1
-
+    
     if sample_count % 3 == 0:
         window.psp_plot.update()
         window.raw_data_plot.update()
@@ -238,7 +234,9 @@ def send_recieve_packages():
         
         for line in psp_lines:
             line.update()
-
+    
+    start = timer()
+    current_pattern = window.dropdown_patterns.value()
     while True:
         selected_sample_idx = classid2sampleidx(current_pattern)
         print('send current', current_pattern, 'select', selected_sample_idx)
@@ -258,16 +256,16 @@ def send_recieve_packages():
             window.input_class_label.setText("Current Running Pattern :" + current_pattern.__str__() + "\nStep :" + t.__str__())
             for n in range(s.__len__()):
                 if s[n] > 0:
-                     window.listw.insertItem(0, "Spike Detected! Neuron: {}, Step: {} ".format(n, t))
+                    window.listw.insertItem(0, "Spike Detected! Neuron: {}, Step: {} ".format(n, t))
             # Reset psp at last step
-            if t == WINDOW - 1:
+            if t == WINDOW-1:
                 controller.reset_neuron()
-
+                
         window.listw.insertItem(0, "End Pattern: " + current_pattern.__str__())
         if not window.auto_check_box.checkState():
             break
         # Wait to allow for observation of complete run
-        time.sleep(0)
+        time.sleep(3.0)
         current_pattern = np.random.randint(0, high=PATTERNS)
         selected_sample_idx = classid2sampleidx(current_pattern)
 
@@ -286,7 +284,7 @@ def update():
     voltage = np.zeros([NEURONS, DATA_PLOT_RANGE])
     psp = np.zeros([SYNAPSES, WINDOW])
     out_spikes = np.zeros([NEURONS, WINDOW])
-    raw_data = np.zeros([22, WINDOW])
+    raw_data = np.zeros([22, DATA_PLOT_RANGE])
     last_t = 0
     current_t = 0
     ptr = -SLIDING_WINDOW
@@ -305,41 +303,39 @@ def update():
             if USE_SLIDING_WINDOW:
                 voltage[:,0:-1] = voltage[:,1:]
 #                psp[:,0:-1] = psp[:,1:]
-#                raw_data[:, 0:-1] = raw_data[:,1:]
+                raw_data[:, 0:-1] = raw_data[:,1:]
                 
                 voltage[:, -1] = v
 #                psp[:, -1] = p
-#                raw_data[:, -1] = raw_input[selected_sample_idx, :, t]
+                raw_data[:, -1] = raw_input[selected_sample_idx, :, t]
             else:
                 voltage[:, t] = v
 #                psp[:, t] = p
-#                raw_data[:, :t] = raw_input[selected_sample_idx, :, :t]
+                # raw_data[:, :t] = raw_input[selected_sample_idx, :, :t]
             
-            raw_data[:, t] = raw_input[selected_sample_idx, :, t]
+            # raw_data[:, t] = raw_input[selected_sample_idx, :, t]
+
             psp[:, t] = p
             out_spikes[:, t] = s
             current_t = t
             if t < last_t:
-                last_t = 0
                 in_scatter.setData([-5], [-5])
                 out_scatter.setData([-5], [-5])
                 in_scatter.clear()
                 out_scatter.clear()
-                
-            
+
             #reset all data at the begining of each run
             if t == 0:
                 out_spikes = np.zeros([NEURONS, WINDOW])
                 voltage = np.zeros([NEURONS, DATA_PLOT_RANGE])
                 psp = np.zeros([SYNAPSES, WINDOW])
-                raw_data = np.zeros([22, WINDOW])
+                raw_data = np.zeros([22, DATA_PLOT_RANGE])
                 ptr = -SLIDING_WINDOW
                 # window.input_class_value.setText(str(current_pattern))
             
             spike_count = spike[selected_sample_idx, :current_t, :].sum()
             
             # window.spike_count_value.setText('{:4d}'.format(spike_count))
-
 
         # Synapse Plotting
         x = []
@@ -350,11 +346,13 @@ def update():
             # raw_data_lines[i].setData(np.random.random(WINDOW) + i)
             raw_data_lines[i].setData(raw_data[i])
             psp_lines[i].setData(psp[::5][i] + i)
-
-#            if USE_SLIDING_WINDOW:
+        
+            if USE_SLIDING_WINDOW:
 #                psp_lines[i].setPos(ptr, 0)
-#                raw_data_lines[i].setPos(ptr, 0)
+                # raw_data_lines[i].setPos(ptr, 0)
+                pass
 
+            # Plotting Input Spikes
             if current_t > last_t:
                 for step in range(last_t, current_t):
                     if spike[selected_sample_idx, step, syn_idx] > 0:
@@ -369,8 +367,11 @@ def update():
         y = []
         sc = 0
         for i in range(DATA_SELECT_NEURONS):
+            if USE_SLIDING_WINDOW:
+                # voltage_lines[i].setPos(ptr, 0)
+                pass
+            
             voltage_lines[i].setData(voltage[i, :])
-            voltage_lines[i].setPos(ptr,0)
             # Plotting Output Spikes
             if current_t > last_t:
                 for step in range(last_t, current_t):
@@ -397,16 +398,15 @@ unique_label = np.unique(labels)
 
 test_spike = spike[0]
 controller = neuron_controller(WINDOW, port=UART_PORT, baudrate=UART_BAUDRATE, timeout=UART_TIMEOUT)
-#
+
 v_record = np.zeros([100,10,WINDOW])
 controller.reset_neuron()
 
 
 display_data = threading.Thread(target=update)
-
 display_data.daemon = True    
 display_data.start()
 
-###############################################################################
+## Start the Qt event loop
 window.show()
 sys.exit(app.exec_())
