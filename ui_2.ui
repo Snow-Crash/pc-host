@@ -49,8 +49,8 @@
       </property>
       <property name="maximumSize">
        <size>
-        <width>250</width>
-        <height>16777215</height>
+        <width>300</width>
+        <height>300</height>
        </size>
       </property>
       <property name="styleSheet">
@@ -63,14 +63,21 @@
     </item>
     <item row="3" column="0">
      <widget class="QWidget" name="control_panel" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>300</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="maximumSize">
        <size>
-        <width>250</width>
+        <width>350</width>
         <height>16777215</height>
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(62, 60, 61);</string>
+       <string notr="true">background-color: rgb(111, 119, 125);
+</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
        <property name="leftMargin">
@@ -85,73 +92,88 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <property name="spacing">
+       <property name="horizontalSpacing">
         <number>0</number>
        </property>
-       <item row="3" column="0">
-        <widget class="QCheckBox" name="auto_check_box">
-         <property name="maximumSize">
-          <size>
-           <width>400</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>CheckBox</string>
-         </property>
-        </widget>
-       </item>
+       <property name="verticalSpacing">
+        <number>10</number>
+       </property>
        <item row="1" column="0">
-        <widget class="QToolButton" name="btn">
+        <widget class="QFrame" name="splot_line_0">
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>50</height>
+           <height>2</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>400</width>
-           <height>100</height>
+           <width>16777215</width>
+           <height>2</height>
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">QToolButton {
-    border: none;
-    border-radius: 0px;
-	text-align:left;
-	
-    /*background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                      stop: 0 #f6f7fa, stop: 1 #dadbde);
-	*/
-	background-color: rgb(99, 100, 102);
-    /*min-width: 80px;*/
-}
-
-QToolButton:pressed {
-    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                      stop: 0 #dadbde, stop: 1 #f6f7fa);
-}
-
-QToolButton:hover {
-	background-color: rgb(112, 119, 127);
-	 /*background-color: #c1b1b6;*/
- }
-
-
-
-QToolButton:default {
-    border-color: navy; /* make the default button prominent */
-}
-
-</string>
+          <string notr="true">background-color: rgb(173, 179, 184);</string>
          </property>
-         <property name="text">
-          <string>        Run</string>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="6" column="0">
+        <widget class="QFrame" name="split_line_2">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>2</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>2</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(173, 179, 184);</string>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QFrame" name="split_line_3">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>2</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>2</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(173, 179, 184);</string>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
         <widget class="QLabel" name="input_class_label">
          <property name="maximumSize">
           <size>
@@ -159,12 +181,59 @@ QToolButton:default {
            <height>16777215</height>
           </size>
          </property>
+         <property name="styleSheet">
+          <string notr="true">QLabel {
+font-family: &quot;Arial&quot;;
+font-size: 18px;
+color : rgb(250,250,250);
+text-align:center;
+background-color: rgb(111, 119, 125);
+}
+</string>
+         </property>
+         <property name="text">
+          <string>Output</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="placeholder">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>100</height>
+          </size>
+         </property>
          <property name="text">
           <string>TextLabel</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="4" column="0">
+        <widget class="QLabel" name="combobox_label">
+         <property name="maximumSize">
+          <size>
+           <width>400</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">
+
+QLabel {
+font-family: &quot;Arial&quot;;
+font-size: 18px;
+color : rgb(250,250,250);
+text-align:center;
+}
+</string>
+         </property>
+         <property name="text">
+          <string>Select input class</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
         <widget class="ComboBox" name="dropdown_patterns">
          <property name="maximumSize">
           <size>
@@ -177,7 +246,7 @@ QToolButton:default {
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="10" column="0">
         <widget class="QListWidget" name="listw">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
@@ -192,9 +261,121 @@ QToolButton:default {
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">QListWidget {
+          <string notr="true">
+QListWidget {
+font-family: &quot;Arial&quot;;
+font-size: 15px;
+color : rgb(250,250,250);
+text-align:center;
+background-color: rgb(173, 179, 184);
+}
+</string>
+         </property>
+         <property name="verticalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QCheckBox" name="auto_check_box">
+         <property name="maximumSize">
+          <size>
+           <width>400</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QCheckBox {
+font-family: &quot;Arial&quot;;
+font-size: 18px;
+color : rgb(250,250,250);
+text-align:center;
+background-color: rgb(111, 119, 125);
+}
+</string>
+         </property>
+         <property name="text">
+          <string>Auto demo</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QFrame" name="split_line_1">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>2</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>2</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(173, 179, 184);</string>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QToolButton" name="btn">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>70</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>400</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QToolButton {
     border: none;
-}</string>
+    border-radius: 0px;
+	
+    /*background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #f6f7fa, stop: 1 #dadbde);
+	*/
+	background-color: rgb(111, 119, 125);
+    /*min-width: 80px;*/
+}
+
+QToolButton:pressed {
+    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                      stop: 0 #dadbde, stop: 1 #f6f7fa);
+}
+
+QToolButton:hover {
+	background-color: rgb(212, 69, 1,100);
+	 /*background-color: #c1b1b6;*/
+ }
+
+
+
+QToolButton:default {
+    border-color: navy; /* make the default button prominent */
+}
+
+QToolButton {
+font-family: &quot;Arial&quot;;
+font-size: 18px;
+color : rgb(250,250,250);
+text-align:center;
+}
+</string>
+         </property>
+         <property name="text">
+          <string>        Run</string>
          </property>
         </widget>
        </item>
@@ -597,8 +778,8 @@ p, li { white-space: pre-wrap; }
              <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Arial'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei'; font-size:10pt; font-weight:600; color:#32aede;&quot;&gt;Result:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Microsoft YaHei'; font-size:10pt; font-weight:600; color:#32aede;&quot;&gt;Result&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
@@ -703,17 +884,6 @@ p, li { white-space: pre-wrap; }
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1835</width>
-     <height>26</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <customwidgets>
   <customwidget>

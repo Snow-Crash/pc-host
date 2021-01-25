@@ -8,7 +8,7 @@ import tkinter as Tk
 import numpy as np
 import matplotlib.animation as animation
 from pyqtgraph.Qt import QtCore, QtGui
-import pyqtgraph.opengl as gl
+#import pyqtgraph.opengl as gl
 import pyqtgraph as pg
 from PyQt5 import QtTest
 import sys
@@ -264,7 +264,7 @@ if __name__ == '__main__':
     controller.reset_neuron()
     
     test_pyqtgraph = False
-    use_fake_data = True
+    use_fake_data = False
     
     if test_pyqtgraph:
         start = timer()

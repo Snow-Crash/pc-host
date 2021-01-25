@@ -12,7 +12,7 @@ http://www.pyqtgraph.org/downloads/0.10.0/pyqtgraph-0.10.0-deb/pyqtgraph-0.10.0/
 """
 # Import libraries
 import numpy as np
-from pyqtgraph.Qt import QtGui, QtCore
+from pyqtgraph.Qt import QtGui, QtCore, QtWidgets
 import pyqtgraph as pg
 import PyQt5.QtWidgets
 from pyqtgraph.widgets.RemoteGraphicsView import RemoteGraphicsView
@@ -101,7 +101,7 @@ btn = QtGui.QPushButton('Run')
 btn.setFont(font)
 btn.setIcon(QtGui.QIcon(btn_background))
 #btn.setIconSize(btn_background.rect().size());
-btn.setIconSize(QtCore.QSize(64, 64));
+btn.setIconSize(QtCore.QSize(64, 64))
 btn.setMaximumWidth(control_panel_max_width)
 
 # text = QtGui.QLineEdit('enter text')
@@ -119,10 +119,10 @@ dropdown_patterns.setMaximumWidth(control_panel_max_width)
 #control panel is a container, place widgets in it
 control_panel = QtGui.QVBoxLayout()
 control_panel.addWidget(btn)
+control_panel.addWidget(auto_check_box)
 control_panel.addWidget(dropdown_patterns)
 # control_panel.addWidget(text)
 control_panel.addWidget(listw)
-control_panel.addWidget(auto_check_box)
 control_panel.addWidget(input_class_label)
 
 #This is a container
@@ -189,13 +189,144 @@ outspike_plot.setYRange(-0.5, NEURONS + 0.5, padding=0)
 layout = QtGui.QGridLayout()
 w.setLayout(layout)
 
+#######################################################################
+drop_down_instruction = QtWidgets.QLabel()
+# drop_down_instruction.setStyleSheet("QLabel {\n"
+# "font-family: \"Arial\";\n"
+# "font-size: 30px;\n"
+# "color : rgb(219,61,1);\n"
+# "}")
+drop_down_instruction.setText("Select input pattern:")
+drop_down_instruction.setAlignment(QtCore.Qt.AlignLeft)
+drop_down_instruction.setFont(font)
+control_panel.insertWidget(2,drop_down_instruction)
+
+_translate = QtCore.QCoreApplication.translate
+
+# result_container = QtWidgets.QWidget()
+# result_container.setStyleSheet("background-color: rgb(250, 250, 250);")
+# result_container.setObjectName("result_container")
+# gridLayout_6 = QtWidgets.QGridLayout(result_container)
+# gridLayout_6.setContentsMargins(0, 0, 0, 0)
+# gridLayout_6.setSpacing(0)
+# gridLayout_6.setObjectName("gridLayout_6")
+# input_class_value = QtWidgets.QLabel(result_container)
+# input_class_value.setStyleSheet("QLabel {\n"
+# "font-family: \"Arial\";\n"
+# "font-size: 30px;\n"
+# "color : rgb(219,61,1);\n"
+# "}")
+# input_class_value.setText("")
+# input_class_value.setAlignment(QtCore.Qt.AlignCenter)
+# input_class_value.setObjectName("input_class_value")
+# gridLayout_6.addWidget(input_class_value, 1, 0, 1, 1)
+# output_class_value = QtWidgets.QLabel(result_container)
+# output_class_value.setStyleSheet("QLabel {\n"
+# "font-family: \"Arial\";\n"
+# "font-size: 30px;\n"
+# "color : rgb(219,61,1);\n"
+# "}")
+# output_class_value.setText("")
+# output_class_value.setAlignment(QtCore.Qt.AlignCenter)
+# output_class_value.setObjectName("output_class_value")
+# gridLayout_6.addWidget(output_class_value, 1, 1, 1, 1)
+# input_class_text = QtWidgets.QLabel(result_container)
+# input_class_text.setObjectName("input_class_text")
+# gridLayout_6.addWidget(input_class_text, 2, 0, 1, 1)
+# output_class_text = QtWidgets.QLabel(result_container)
+# output_class_text.setObjectName("output_class_text")
+# gridLayout_6.addWidget(output_class_text, 2, 1, 1, 1)
+# spike_count_value = QtWidgets.QLabel(result_container)
+# spike_count_value.setStyleSheet("QLabel {\n"
+# "font-family: \"Arial\";\n"
+# "font-size: 30px;\n"
+# "color : rgb(219,61,1);\n"
+# "}")
+# spike_count_value.setText("")
+# spike_count_value.setAlignment(QtCore.Qt.AlignCenter)
+# spike_count_value.setObjectName("spike_count_value")
+# gridLayout_6.addWidget(spike_count_value, 1, 2, 1, 1)
+# spike_count_text = QtWidgets.QLabel(result_container)
+# spike_count_text.setObjectName("spike_count_text")
+# gridLayout_6.addWidget(spike_count_text, 2, 2, 1, 1)
+# result_title = QtWidgets.QLabel(result_container)
+# result_title.setMinimumSize(QtCore.QSize(0, 30))
+# result_title.setMaximumSize(QtCore.QSize(16777215, 30))
+# result_title.setObjectName("result_title")
+# gridLayout_6.addWidget(result_title, 0, 0, 1, 3)
+
+# input_class_value.setText("-")
+# output_class_value.setText("-")
+# spike_count_value.setText("-")
+
+
+# input_class_text.setText(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+# "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+# "p, li { white-space: pre-wrap; }\n"
+# "</style></head><body style=\" font-family:\'SimSun\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+# "<p align=\"center\" style=\" margin-top:5px; margin-bottom:5px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:10pt; color:#6f777d;\">Input</span></p>\n"
+# "<p align=\"center\" style=\" margin-top:5px; margin-bottom:5px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:10pt; color:#6f777d;\">Class</span></p></body></html>"))
+# output_class_text.setText(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+# "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+# "p, li { white-space: pre-wrap; }\n"
+# "</style></head><body style=\" font-family:\'SimSun\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+# "<p align=\"center\" style=\" margin-top:5px; margin-bottom:5px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:10pt; color:#6f777d;\">Output</span></p>\n"
+# "<p align=\"center\" style=\" margin-top:5px; margin-bottom:5px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:10pt; color:#6f777d;\">Class</span></p></body></html>"))
+# spike_count_text.setText(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+# "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+# "p, li { white-space: pre-wrap; }\n"
+# "</style></head><body style=\" font-family:\'SimSun\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+# "<p align=\"center\" style=\" margin-top:5px; margin-bottom:5px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:10pt; color:#6f777d;\">Spike</span></p>\n"
+# "<p align=\"center\" style=\" margin-top:5px; margin-bottom:5px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Arial\'; font-size:10pt; color:#6f777d;\">Count</span></p></body></html>"))
+# result_title.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\"><span style=\" font-family:\'Arial\'; font-size:10pt; \">Result</span></p></body></html>"))
+# layout.addWidget(result_container, 5, 3, 2, 2)  #
+
+logo = QtWidgets.QLabel()
+logo.setMinimumSize(QtCore.QSize(128, 128))
+logo.setMaximumSize(QtCore.QSize(300, 300))
+logo.setStyleSheet("background-color: rgb(212, 69, 1);")
+logo.setText("")
+logo.setObjectName("logo")
+su_logo_background = QtGui.QPixmap('./images/su_logo_white.png')
+logo.setPixmap(su_logo_background.scaled(QtCore.QSize(150, 150)))
+logo.setAlignment(QtCore.Qt.AlignCenter)
+control_panel.insertWidget(0,logo)
+
+
+banner = QtWidgets.QWidget()
+banner.setMinimumSize(QtCore.QSize(0, 100))
+banner.setMaximumSize(QtCore.QSize(16777215, 100))
+banner.setObjectName("banner")
+gridLayout_10 = QtWidgets.QGridLayout(banner)
+gridLayout_10.setContentsMargins(100, 0, 0, 0)
+gridLayout_10.setSpacing(0)
+gridLayout_10.setObjectName("gridLayout_10")
+banner_logo = QtWidgets.QLabel(banner)
+banner_logo.setMaximumSize(QtCore.QSize(300, 16777215))
+banner_logo.setText("")
+banner_logo.setObjectName("banner_logo")
+banner_logo_img = QtGui.QPixmap('./images/eng_logo_2.png')
+banner_logo.setPixmap(banner_logo_img.scaled(QtCore.QSize(250, 300),
+                                                    QtCore.Qt.KeepAspectRatio))
+gridLayout_10.addWidget(banner_logo, 0, 1, 1, 1)
+title_label = QtWidgets.QLabel(banner)
+title_label.setMinimumSize(QtCore.QSize(0, 50))
+title_label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:x-large; font-weight:600; color:#6f777d;\">Neuromorphic System for Temporal Data Classification</span></p></body></html>"))
+font = QtGui.QFont()
+font.setFamily("Arial")
+title_label.setFont(font)
+title_label.setObjectName("title_label")
+gridLayout_10.addWidget(title_label, 0, 2, 1, 3)
+layout.addWidget(banner, 0,1,1,4)
+#######################################################################
+
 #add control panel and figures to it
-layout.addLayout(control_panel, 0, 0, 5, 1)
-layout.addWidget(raw_data_plot, 0, 1, 2, 2)  #
-layout.addWidget(inspike_plot, 0, 3, 2, 2)  #
-layout.addWidget(psp_plot, 2, 1, 2, 2)  #
-layout.addWidget(voltage_plot, 2, 3, 2, 2)  #
-layout.addWidget(outspike_plot, 4, 1, 2, 2)  #
+layout.addLayout(control_panel, 0, 0, 6, 1)
+layout.addWidget(raw_data_plot, 1, 1, 2, 2)  #
+layout.addWidget(inspike_plot, 1, 3, 2, 2)  #
+layout.addWidget(psp_plot, 3, 1, 2, 2)  #
+layout.addWidget(voltage_plot, 3, 3, 2, 2)  #
+layout.addWidget(outspike_plot, 5, 1, 2, 2)  #
 layout.setSpacing(30)
 layout.setMargin(30)
 
@@ -235,7 +366,7 @@ def send_recieve_packages():
                 if s[n] > 0:
                     listw.insertItem(0, "Spike Detected! Neuron: {}, Step: {} ".format(n, t))
             # Reset psp at last step
-            if (t == 450-1):
+            if (t == WINDOW-1):
                 controller.reset_neuron()
                 
         listw.insertItem(0, "End Pattern: " + current_pattern.__str__())
@@ -306,6 +437,19 @@ def update():
                 psp = np.zeros([SYNAPSES, WINDOW])
                 raw_data = np.zeros([22, DATA_PLOT_RANGE])
                 ptr = -SLIDING_WINDOW
+
+            #     try:
+            #         input_class_value.setText(str(current_pattern))
+            #         output_class_value.setText("-")
+            #     except Exception:
+            #         pass
+            
+            # spike_count = spike[selected_sample_idx, :current_t, :].sum()
+
+            # try:
+            #     spike_count_value.setText('{:4d}'.format(spike_count))
+            # except Exception:
+            #     pass
                 
 
 
@@ -362,7 +506,8 @@ def update():
 
 btn.clicked.connect(btn_clicked_function)
 
-spike = np.load(PREPROCESSED_SPIKE_LOCATION)
+spike = np.load(PREPROCESSED_SPIKE_LOCATION)/1000
+spike = spike.astype(int)
 raw_input = np.load(RAW_DATA_LOCATION)
 labels = np.load(LABEL_LOCATION)
 unique_label = np.unique(labels)

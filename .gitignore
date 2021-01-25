@@ -1,0 +1,5 @@
+.idea/*
+*.pyc
+*.qss
+*.qrc
+*.ai

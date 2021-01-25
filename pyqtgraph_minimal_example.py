@@ -15,12 +15,14 @@ from PyQt5 import QtTest
 
 
 app = QtGui.QApplication(sys.argv)
+win = QtGui.QMainWindow()
 w = gl.GLViewWidget()
 w.setBackgroundColor('w')
 w.opts['azimuth'] = 90
 w.opts['elevation'] = 0
-w.setGeometry(0, 110, 1920, 1080)
+w.setGeometry(200, 200, 800, 600)
 w.show()
+win.openGLWidget.addItem(w)
 
 traces = dict()
 

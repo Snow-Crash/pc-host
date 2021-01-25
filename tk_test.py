@@ -2,7 +2,9 @@
 """
 Created on Sat Jun 22 17:47:02 2019
 
-@author: hw
+@author: 
+    
+ref : https://stackoverflow.com/questions/30774281/update-matplotlib-plot-in-tkinter-gui
 """
 
 import matplotlib
